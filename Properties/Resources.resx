@@ -118,6 +118,18 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="elemts-01" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\elemts-01.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="elemts-02" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\elemts-02.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="images-01" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\images-01.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="images-02" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\images-02.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="Untitled1-01" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Untitled1-01.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>

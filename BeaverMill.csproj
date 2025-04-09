@@ -9,11 +9,23 @@
   </PropertyGroup>
 	
   <ItemGroup>
+    <None Remove="Resources\elemts-01.png" />
+    <None Remove="Resources\elemts-02.png" />
+    <None Remove="Resources\images-02.png" />
     <None Remove="Resources\Untitled1-01.png" />
     <None Remove="Resources\Untitled1-02.png" />
   </ItemGroup>
 	
   <ItemGroup>
+    <EmbeddedResource Include="Resources\elemts-01.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\elemts-02.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\images-02.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Untitled1-01.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>

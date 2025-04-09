@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 
 using Grasshopper.Kernel;
+using Rhino;
 using Rhino.Geometry;
+using System.Drawing;
+using System.IO;
+
 
 namespace BeaverMill
 {
@@ -23,15 +27,15 @@ namespace BeaverMill
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddBrepParameter("Surface A", "A", "First surface", GH_ParamAccess.item);
-            pManager.AddBrepParameter("Surface B", "B", "Second surface", GH_ParamAccess.item);
-            pManager.AddNumberParameter("Finger Gap", "Gap", "Gap between fingers", GH_ParamAccess.item);
-            pManager.AddNumberParameter("Finger Depth", "Depth", "Depth of fingers", GH_ParamAccess.item);
-            pManager.AddIntegerParameter("Number of Fingers", "N", "Number of fingers", GH_ParamAccess.item);
-            pManager.AddBooleanParameter("Flip", "Flip", "Flip finger direction", GH_ParamAccess.item);
-            pManager.AddCurveParameter("Intersection Curve", "C", "Curve at joint", GH_ParamAccess.item);
-            pManager.AddNumberParameter("Rotate A", "RA", "Rotation for surface A", GH_ParamAccess.item);
-            pManager.AddNumberParameter("Rotate B", "RB", "Rotation for surface B", GH_ParamAccess.item);
+            pManager.AddBrepParameter("Surface A", "A", "First Brep surface", GH_ParamAccess.item);
+            pManager.AddBrepParameter("Surface B", "B", "Second Brep surface", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Finger Gap", "FG", "Gap between fingers", GH_ParamAccess.item, 1.0);
+            pManager.AddNumberParameter("Finger Depth", "FD", "Depth of the fingers", GH_ParamAccess.item, 5.0);
+            pManager.AddIntegerParameter("Number of Fingers", "N", "Number of fingers", GH_ParamAccess.item, 5);
+            pManager.AddBooleanParameter("Flip Direction", "Flip", "Flip the direction of fingers", GH_ParamAccess.item, false);
+            pManager.AddCurveParameter("Intersection Curve", "C", "Curve defining the intersection of surfaces", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Rotation Angle A", "RA", "Rotation angle for surface A", GH_ParamAccess.item, 0.0);
+            pManager.AddNumberParameter("Rotation Angle B", "RB", "Rotation angle for surface B", GH_ParamAccess.item, 0.0);
         }
 
         /// <summary>
@@ -39,10 +43,10 @@ namespace BeaverMill
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddCurveParameter("Cutouts A", "A_Out", "Cutouts for A", GH_ParamAccess.list);
-            pManager.AddCurveParameter("Cutouts B", "B_Out", "Cutouts for B", GH_ParamAccess.list);
-            pManager.AddBrepParameter("Rotated A", "RA_Out", "Rotated surface A", GH_ParamAccess.item);
-            pManager.AddBrepParameter("Rotated B", "RB_Out", "Rotated surface B", GH_ParamAccess.item);
+            pManager.AddCurveParameter("Surface A Cutouts", "CA", "Cutout curves for surface A", GH_ParamAccess.list);
+            pManager.AddCurveParameter("Surface B Cutouts", "CB", "Cutout curves for surface B", GH_ParamAccess.list);
+            pManager.AddBrepParameter("Rotated Surface A", "RA", "Rotated version of Surface A", GH_ParamAccess.item);
+            pManager.AddBrepParameter("Rotated Surface B", "RB", "Rotated version of Surface B", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -52,33 +56,30 @@ namespace BeaverMill
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             Brep surfaceA = null, surfaceB = null;
-            double fingerGap = 0, fingerDepth = 0, rotationAngleA = 0, rotationAngleB = 0;
-            int numFingers = 0;
+            double fingerGap = 1.0, fingerDepth = 5.0, rotationAngleA = 0.0, rotationAngleB = 0.0;
+            int numFingers = 5;
             bool flipDirection = false;
             Curve intersectionCurve = null;
 
-            if (!DA.GetData(0, ref surfaceA)) return;
-            if (!DA.GetData(1, ref surfaceB)) return;
-            if (!DA.GetData(2, ref fingerGap)) return;
-            if (!DA.GetData(3, ref fingerDepth)) return;
-            if (!DA.GetData(4, ref numFingers)) return;
-            if (!DA.GetData(5, ref flipDirection)) return;
-            if (!DA.GetData(6, ref intersectionCurve)) return;
-            if (!DA.GetData(7, ref rotationAngleA)) return;
-            if (!DA.GetData(8, ref rotationAngleB)) return;
-
-            if (intersectionCurve == null || surfaceA == null || surfaceB == null || numFingers < 2 || fingerDepth <= 0)
+            if (!DA.GetData(0, ref surfaceA) || !DA.GetData(1, ref surfaceB) ||
+                !DA.GetData(2, ref fingerGap) || !DA.GetData(3, ref fingerDepth) ||
+                !DA.GetData(4, ref numFingers) || !DA.GetData(5, ref flipDirection) ||
+                !DA.GetData(6, ref intersectionCurve) ||
+                !DA.GetData(7, ref rotationAngleA) || !DA.GetData(8, ref rotationAngleB))
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Invalid inputs!");
                 return;
+            }
 
-            List<Curve> cutoutsA = new();
-            List<Curve> cutoutsB = new();
+            List<Curve> cutoutsA = new List<Curve>();
+            List<Curve> cutoutsB = new List<Curve>();
 
             Point3d rotationCenter = intersectionCurve.PointAtNormalizedLength(0.5);
             Vector3d axis = intersectionCurve.TangentAt(intersectionCurve.Domain.Mid);
             axis.Unitize();
 
-            double angleA_rad = Rhino.RhinoMath.ToRadians(rotationAngleA);
-            double angleB_rad = Rhino.RhinoMath.ToRadians(rotationAngleB);
+            double angleA_rad = RhinoMath.ToRadians(rotationAngleA);
+            double angleB_rad = RhinoMath.ToRadians(rotationAngleB);
 
             Transform rotationA = Transform.Rotation(angleA_rad, axis, rotationCenter);
             Transform rotationB = Transform.Rotation(angleB_rad, axis, rotationCenter);
@@ -104,9 +105,8 @@ namespace BeaverMill
                     if (thisWidth <= 0) break;
                 }
 
-                double tStart, tEnd;
-                intersectionCurve.LengthParameter(currentLength, out tStart);
-                intersectionCurve.LengthParameter(currentLength + thisWidth, out tEnd);
+                intersectionCurve.LengthParameter(currentLength, out double tStart);
+                intersectionCurve.LengthParameter(currentLength + thisWidth, out double tEnd);
 
                 double tMid = (tStart + tEnd) / 2.0;
                 Point3d midPt = intersectionCurve.PointAt(tMid);
@@ -127,7 +127,7 @@ namespace BeaverMill
                 Point3d pt3 = midPt + half + normal;
                 Point3d pt4 = midPt + half;
 
-                Polyline fingerProfile = new(new List<Point3d> { pt1, pt2, pt3, pt4, pt1 });
+                Polyline fingerProfile = new Polyline(new List<Point3d> { pt1, pt2, pt3, pt4, pt1 });
 
                 if (i % 2 == 0)
                 {
@@ -154,13 +154,15 @@ namespace BeaverMill
         /// <summary>
         /// Provides an Icon for the component.
         /// </summary>
-        protected override System.Drawing.Bitmap Icon
+        protected override Bitmap Icon
         {
             get
             {
-                //You can add image files to your project resources and access them like this:
-                // return Resources.IconForThisComponent;
-                return null;
+                using (MemoryStream ms = new MemoryStream(Properties.Resources.images_02))
+                {
+                    Bitmap bmp = new Bitmap(ms);
+                    return new Bitmap(bmp, new Size(24, 24));
+                }
             }
         }
 

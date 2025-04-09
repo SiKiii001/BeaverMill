@@ -63,6 +63,46 @@ namespace BeaverMill.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] elemts_01 {
+            get {
+                object obj = ResourceManager.GetObject("elemts-01", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] elemts_02 {
+            get {
+                object obj = ResourceManager.GetObject("elemts-02", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] images_01 {
+            get {
+                object obj = ResourceManager.GetObject("images-01", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] images_02 {
+            get {
+                object obj = ResourceManager.GetObject("images-02", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] Untitled1_01 {
             get {
                 object obj = ResourceManager.GetObject("Untitled1-01", resourceCulture);
