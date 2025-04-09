@@ -11,6 +11,7 @@
   <ItemGroup>
     <None Remove="Resources\elemts-01.png" />
     <None Remove="Resources\elemts-02.png" />
+    <None Remove="Resources\images-01.png" />
     <None Remove="Resources\images-02.png" />
     <None Remove="Resources\Untitled1-01.png" />
     <None Remove="Resources\Untitled1-02.png" />
@@ -36,6 +37,12 @@
   
   <ItemGroup>
     <PackageReference Include="Grasshopper" Version="7.13.21348.13001" IncludeAssets="compile;build" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\images-01.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   
   <ItemGroup>
